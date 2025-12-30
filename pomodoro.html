@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+</head>
+<body>
+    <button class="userchoicetiming" data-min="45">45</button>
+    <button class="userchoicetiming" data-min="30">30</button>
+    <button class="userchoicetiming" data-min="120">120</button>
+    <button class="userchoicetiming" data-min="25">25</button><br>
+    <br>
+    <h1>u've got </h1>
+    <span id="timer"></span>
+</body>
+<script>
+    let currentIntervalId = null; // track the running interval
+    let currentButton = null;     // optional: track active button
+
+    function pomodoro(timeInSecond, display, button) {
+        // stop any previous timer
+        if (currentIntervalId) {
+            clearInterval(currentIntervalId);
+            currentIntervalId = null;
+        }
+        // update active button styling
+        if (currentButton) currentButton.classList.remove('active');
+        currentButton = button;
+        if (currentButton) currentButton.classList.add('active');
+
+        let timer = timeInSecond;
+        currentIntervalId = setInterval(function () {
+            const minutes = Math.floor(timer / 60);
+            const seconds = timer % 60;
+
+            display.textContent =
+                (minutes < 10 ? "0" : "") + minutes + ":" +
+                (seconds < 10 ? "0" : "") + seconds;
+
+            if (--timer < 0) {
+                clearInterval(currentIntervalId);
+                currentIntervalId = null;
+                display.textContent = "Time's up!";
+                if (currentButton) {
+                    currentButton.classList.remove('active');
+                    currentButton = null;
+                }
+            }
+        }, 1000);
+    }
+
+    window.onload = function () {
+        const buttons = document.querySelectorAll('.userchoicetiming');
+        const display = document.getElementById('timer');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const minutes = parseInt(btn.dataset.min, 10);
+                if (isNaN(minutes)) return;
+                const timeInSecond = minutes * 60;
+                pomodoro(timeInSecond, display, btn);
+            });
+        });
+    };
+</script>
+
+</html>
